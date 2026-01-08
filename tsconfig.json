@@ -20,6 +20,6 @@
 
     "types": ["node"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts","build.ts"],
   "exclude": ["node_modules", "dist"]
 }
