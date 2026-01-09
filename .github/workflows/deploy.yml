@@ -34,8 +34,9 @@ jobs:
       - name: Generate image tag
         id: meta
         run: |
-          IMAGE=${{ env.ACR_REGISTRY }}/${{ env.ACR_NAMESPACE }}/${{ env.ACR_REPOSITORY }}:${{ github.sha }}
-          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+          IMAGE="${{ env.ACR_REGISTRY }}/${{ env.ACR_NAMESPACE }}/${{ env.ACR_REPOSITORY }}:latest"
+          echo "image=${IMAGE}" >> $GITHUB_OUTPUT
+          echo "Generated image: ${IMAGE}"
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
@@ -66,13 +67,19 @@ jobs:
 
       - name: Configure Aliyun Credentials
         run: |
-            s config add \
+          s config add \
             --AccessKeyID ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }} \
             --AccessKeySecret ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }} \
             -a default -f
 
+      - name: Debug - Check image value
+        run: |
+          echo "Image from build job: ${{ needs.build-and-push.outputs.image }}"
+          if [ -z "${{ needs.build-and-push.outputs.image }}" ]; then
+            echo "ERROR: Image URL is empty!"
+            exit 1
+          fi
+
       - name: Deploy to Function Compute
         run: |
-          IMAGE_URL="${{ needs.build-and-push.outputs.image }}"
-          echo "Deploying image: ${IMAGE_URL}"
-          s deploy -y --vars image="${IMAGE_URL}"
+          s deploy -y --vars image="${{ needs.build-and-push.outputs.image }}"
