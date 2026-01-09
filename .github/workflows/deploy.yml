@@ -68,7 +68,6 @@ jobs:
           ACR_REGISTRY: ${{ secrets.ACR_REGISTRY }}
           ACR_NAMESPACE: ${{ secrets.ACR_NAMESPACE }}
           ACR_REPOSITORY: ${{ secrets.ACR_REPOSITORY }}
+          IMAGE_URL: ${{ env.ACR_REGISTRY }}/${{ env.ACR_NAMESPACE }}/${{ env.ACR_REPOSITORY }}:latest
         run: |
-          IMAGE_URL="${ACR_REGISTRY}/${ACR_NAMESPACE}/${ACR_REPOSITORY}:latest"
-          echo "Deploying image: ${IMAGE_URL}"
-          s deploy -y --vars image="${IMAGE_URL}"
+          s deploy -y

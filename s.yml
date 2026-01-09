@@ -4,7 +4,7 @@ name: paddle-ocr-project
 vars:
   region: "cn-hongkong"
   functionName: "paddle-ocr-mcp"
-  image: ""
+  image: ${env.IMAGE_URL}
 
 resources:
   paddle-ocr-function:
