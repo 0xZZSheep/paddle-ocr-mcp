@@ -54,13 +54,21 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Serverless Devs
-        uses: serverless-devs/setup-action@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          access-key-id: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }}
-          access-key-secret: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }}
+          node-version: 24
+
+      - name: Install Serverless Devs
+        run: |
+          npm install -g @serverless-devs/s
+          s --version
 
       - name: Deploy to Aliyun FC
+        env:
+          ALIBABA_CLOUD_ACCESS_KEY_ID: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }}
+          ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }}
+          ALIBABA_CLOUD_REGION: cn-hongkong
         run: |
           s deploy -y \
             --prop image=${{ needs.build-and-push.outputs.image }}
