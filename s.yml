@@ -5,6 +5,9 @@ vars:
   region: "cn-hongkong"
   functionName: "paddle-ocr-mcp"
 
+props:
+  image: ""
+
 resources:
   paddle-ocr-function:
     component: fc3
