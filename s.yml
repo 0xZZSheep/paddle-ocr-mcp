@@ -8,6 +8,7 @@ vars:
 resources:
   paddle-ocr-function:
     component: fc3
+    access: default
     props:
       region: ${vars.region}
       functionName: ${vars.functionName}
