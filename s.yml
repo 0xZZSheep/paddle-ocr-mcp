@@ -5,6 +5,7 @@ access: "default"
 vars:
   region: "cn-hongkong"
   functionName: "paddle-ocr-mcp"
+  image: ""
 
 resources:
   student-meal-function:
@@ -20,7 +21,7 @@ resources:
       instanceConcurrency: 10
 
       customContainerConfig:
-        image: ${image}
+        image: ${vars.image}
         port: 8080
 
       triggers:
