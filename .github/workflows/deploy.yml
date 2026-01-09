@@ -74,4 +74,4 @@ jobs:
       - name: Deploy to Aliyun FC
         run: |
             s deploy -y \
-              --prop image=${{ needs.build-and-push.outputs.image }}
+              --props image=${{ needs.build-and-push.outputs.image }}
