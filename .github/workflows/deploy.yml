@@ -39,9 +39,12 @@ jobs:
         with:
           context: .
           push: true
+          platforms: linux/amd64
           tags: ${{ env.ACR_REGISTRY }}/${{ env.ACR_NAMESPACE }}/${{ env.ACR_REPOSITORY }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          provenance: false
+          sbom: false
 
   deploy:
     needs: build-and-push
