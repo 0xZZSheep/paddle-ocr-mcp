@@ -70,4 +70,4 @@ jobs:
           ACR_REPOSITORY: ${{ secrets.ACR_REPOSITORY }}
           IMAGE_URL: ${{ secrets.ACR_REGISTRY }}/${{ secrets.ACR_NAMESPACE }}/${{ secrets.ACR_REPOSITORY }}:latest
         run: |
-          s deploy -y
+          s deploy -y -c .github/s.js
