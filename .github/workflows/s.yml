@@ -1,0 +1,35 @@
+edition: 3.0.0
+name: student-meal-project
+access: "default"
+
+vars:
+  region: "cn-hangzhou"
+  functionName: "student-meal-prod"
+
+resources:
+  student-meal-function:
+    component: fc3
+    props:
+      region: ${vars.region}
+      functionName: ${vars.functionName}
+      description: "Student Meal Service - Production Environment"
+      runtime: "custom-container"
+      cpu: 1.0
+      memorySize: 1024
+      timeout: 30
+      instanceConcurrency: 10
+
+      customContainerConfig:
+        image: "registry.cn-hangzhou.aliyuncs.com/namespace/repo:tag" # Action 动态覆盖
+        port: 8080
+
+      triggers:
+        - triggerName: httpTrigger
+          triggerType: http
+          triggerConfig:
+            authType: anonymous
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE

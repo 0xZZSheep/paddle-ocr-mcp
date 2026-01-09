@@ -270,6 +270,6 @@ app.delete('/mcp', handleSessionRequest);
 
 const PORT: number = 3000;
 
-app.listen(PORT, (): void => {
+app.listen(PORT, '0.0.0.0',(): void => {
     console.log(`MCP server listening on port ${PORT}`);
 });
