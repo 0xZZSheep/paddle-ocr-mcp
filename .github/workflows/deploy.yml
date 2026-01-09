@@ -1,8 +1,7 @@
 name: Build and Deploy to Aliyun FC
 
 on:
-  push:
-    branches: [ "master" ]
+  workflow_dispatch:
 
 env:
   ACR_REGISTRY: ${{ secrets.ACR_REGISTRY }}
