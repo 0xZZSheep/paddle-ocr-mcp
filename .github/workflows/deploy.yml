@@ -71,7 +71,8 @@ jobs:
             --AccessKeySecret ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }} \
             -a default -f
 
-      - name: Deploy to Aliyun FC
+      - name: Deploy to Function Compute
         run: |
-            s deploy -y \
-              --vars image=${{ needs.build-and-push.outputs.image }}
+          IMAGE_URL="${{ needs.build-and-push.outputs.image }}"
+          echo "Deploying image: ${IMAGE_URL}"
+          s deploy -y --vars image="${IMAGE_URL}"
