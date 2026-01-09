@@ -2,7 +2,7 @@ name: Build and Deploy to Aliyun FC
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 env:
   ACR_REGISTRY: ${{ secrets.ACR_REGISTRY }}
