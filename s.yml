@@ -4,6 +4,7 @@ name: paddle-ocr-project
 vars:
   region: "cn-hongkong"
   functionName: "paddle-ocr-mcp"
+  image: ""
 
 resources:
   paddle-ocr-function:
@@ -20,7 +21,7 @@ resources:
       instanceConcurrency: 10
 
       customContainerConfig:
-        image: ${props.image}
+        image: ${vars.image}
         port: 3000
 
       triggers:
