@@ -70,5 +70,5 @@ jobs:
           ACR_REPOSITORY: ${{ secrets.ACR_REPOSITORY }}
         run: |
           IMAGE_URL="${ACR_REGISTRY}/${ACR_NAMESPACE}/${ACR_REPOSITORY}:latest"
-          echo "Deploying image with SHA: ${{ github.sha }}"
+          echo "Deploying image: ${IMAGE_URL}"
           s deploy -y --vars image="${IMAGE_URL}"
