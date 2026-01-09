@@ -20,7 +20,7 @@ resources:
       instanceConcurrency: 10
 
       customContainerConfig:
-        image: "registry.cn-hangzhou.aliyuncs.com/namespace/repo:tag" # Action 动态覆盖
+        image: ${image}
         port: 8080
 
       triggers:

@@ -7,55 +7,60 @@ env:
   ACR_REGISTRY: ${{ secrets.ACR_REGISTRY }}
   ACR_NAMESPACE: ${{ secrets.ACR_NAMESPACE }}
   ACR_REPOSITORY: ${{ secrets.ACR_REPOSITORY }}
+  ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+  ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
   REGION_ID: cn-hongkong
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     outputs:
-      image_tag: ${{ steps.set_tag.outputs.image }}
+      image: ${{ steps.meta.outputs.image }}
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 1. 登录阿里云 Docker 仓库
       - name: Login to Aliyun ACR
         uses: aliyun/acr-login@v1
         with:
           login-server: ${{ env.ACR_REGISTRY }}
-          region-id: ${{ env.REGION_ID }}
-          access-key-id: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }}
-          access-key-secret: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }}
+          username: ${{ env.ACR_USERNAME }}
+          password: ${{ env.ACR_PASSWORD }}
 
-      # 2. 生成镜像 Tag 并构建镜像
-      - name: Build and Push Docker Image
-        id: set_tag
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Generate image tag
+        id: meta
         run: |
-          # 使用提交的哈希值作为 Tag
-          IMAGE_TAG=${{ env.ACR_REGISTRY }}/${{ env.ACR_NAMESPACE }}/${{ env.ACR_REPOSITORY }}:${{ github.sha }}
-          docker build -t $IMAGE_TAG .
-          docker push $IMAGE_TAG
-          # 将镜像地址设为 Job 输出，供下一个 Job 使用
-          echo "image=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          IMAGE=${{ env.ACR_REGISTRY }}/${{ env.ACR_NAMESPACE }}/${{ env.ACR_REPOSITORY }}:${{ github.sha }}
+          echo "image=$IMAGE" >> $GITHUB_OUTPUT
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.image }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # 3. 安装并配置阿里云 Serverless Devs 工具 (s)
       - name: Setup Serverless Devs
         uses: serverless-devs/setup-action@v2
         with:
           access-key-id: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }}
           access-key-secret: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }}
 
-      # 4. 部署到函数计算
-      # 注意：你需要仓库中有一个 s.yaml 文件来描述函数配置
       - name: Deploy to Aliyun FC
         run: |
-          s deploy --use-local -y \
-            --prop image=${{ needs.build-and-push.outputs.image_tag }}
+          s deploy -y \
+            --prop image=${{ needs.build-and-push.outputs.image }}
