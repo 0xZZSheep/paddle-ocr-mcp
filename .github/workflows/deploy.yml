@@ -57,18 +57,21 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 18
 
       - name: Install Serverless Devs
         run: |
           npm install -g @serverless-devs/s
           s --version
 
-      - name: Deploy to Aliyun FC
-        env:
-          ALIBABA_CLOUD_ACCESS_KEY_ID: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }}
-          ALIBABA_CLOUD_ACCESS_KEY_SECRET: ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }}
-          ALIBABA_CLOUD_REGION: cn-hongkong
+      - name: Configure Aliyun Credentials
         run: |
-          s deploy -y \
-            --prop image=${{ needs.build-and-push.outputs.image }}
+            s config add \
+            --AccessKeyID ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_ID }} \
+            --AccessKeySecret ${{ secrets.ALIBABA_CLOUD_ACCESS_KEY_SECRET }} \
+            -a default -f
+
+      - name: Deploy to Aliyun FC
+        run: |
+            s deploy -y \
+              --prop image=${{ needs.build-and-push.outputs.image }}
