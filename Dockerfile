@@ -12,6 +12,6 @@ FROM node:20-alpine
 WORKDIR /app
 RUN npm install pm2 -g
 COPY --from=builder /app/dist ./dist
-EXPOSE 8080
+EXPOSE 3000
 
 ENTRYPOINT ["pm2-runtime", "dist/bundle.js"]

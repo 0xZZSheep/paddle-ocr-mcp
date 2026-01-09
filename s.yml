@@ -1,6 +1,5 @@
 edition: 3.0.0
-name: student-meal-project
-access: "default"
+name: paddle-ocr-project
 
 vars:
   region: "cn-hongkong"
@@ -8,7 +7,7 @@ vars:
   image: ""
 
 resources:
-  student-meal-function:
+  paddle-ocr-function:
     component: fc3
     props:
       region: ${vars.region}
@@ -22,7 +21,7 @@ resources:
 
       customContainerConfig:
         image: ${vars.image}
-        port: 8080
+        port: 3000
 
       triggers:
         - triggerName: httpTrigger
