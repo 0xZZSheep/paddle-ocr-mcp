@@ -17,6 +17,7 @@ resources:
       runtime: "custom-container"
       cpu: 1.0
       memorySize: 1024
+      diskSize: 512
       timeout: 60
       instanceConcurrency: 10
 
