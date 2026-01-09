@@ -3,8 +3,8 @@ name: student-meal-project
 access: "default"
 
 vars:
-  region: "cn-hangzhou"
-  functionName: "student-meal-prod"
+  region: "cn-hongkong"
+  functionName: "paddle-ocr-mcp"
 
 resources:
   student-meal-function:
@@ -12,7 +12,7 @@ resources:
     props:
       region: ${vars.region}
       functionName: ${vars.functionName}
-      description: "Student Meal Service - Production Environment"
+      description: "paddle-ocr-mcp"
       runtime: "custom-container"
       cpu: 1.0
       memorySize: 1024

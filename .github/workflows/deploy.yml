@@ -8,7 +8,7 @@ env:
   ACR_REGISTRY: ${{ secrets.ACR_REGISTRY }}
   ACR_NAMESPACE: ${{ secrets.ACR_NAMESPACE }}
   ACR_REPOSITORY: ${{ secrets.ACR_REPOSITORY }}
-  REGION_ID: cn-hangzhou # 你的阿里云区域
+  REGION_ID: cn-hongkong
 
 jobs:
   build-and-push:
