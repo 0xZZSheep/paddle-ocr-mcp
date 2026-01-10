@@ -2,6 +2,9 @@
 
 这是一个基于 [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) 协议开发的 Paddle OCR 服务端。
 
+## online server
+https://paddle-ocr-mcp-pbfwikdsob.cn-hongkong.fcapp.run/mcp
+
 ## 快速开始
 
 ### 1. 安装依赖
