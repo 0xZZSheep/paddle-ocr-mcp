@@ -16,8 +16,14 @@ interface TransportMap {
     [sessionId: string]: StreamableHTTPServerTransport;
 }
 
+interface ServerMap {
+    [sessionId: string]: McpServer;
+}
+
 // Map to store transports by session ID
 const transports: TransportMap = {};
+
+const servers: ServerMap = {};
 
 // 定义错误响应的类型
 interface JSONRPCError {
@@ -62,7 +68,7 @@ export async function downloadToBase64(
         return { base64: buffer.toString("base64"), fileName: cachedFile, fileType };
     }
 
-    // 缓存不存在，执行下载
+    // 缓存不存在,执行下载
     const res = await fetch(url);
     if (!res.ok) {
         throw new Error(`Failed to download file: ${res.status}`);
@@ -124,30 +130,34 @@ app.post('/mcp', async (req: Request, res: Response): Promise<void> => {
     let transport: StreamableHTTPServerTransport;
 
     if (sessionId && transports[sessionId]) {
-        // Reuse existing transport
+
         transport = transports[sessionId];
-    } else if (!sessionId && isInitializeRequest(req.body as JSONRPCMessage)) {
-        // New initialization request
+
+    }
+    else if (isInitializeRequest(req.body as JSONRPCMessage)) {
+
+        const apiUrl = req.headers['x-api-url'] as string;
+        const token = req.headers['x-token'] as string;
+
         transport = new StreamableHTTPServerTransport({
             sessionIdGenerator: (): string => randomUUID(),
             onsessioninitialized: (newSessionId: string): void => {
                 // Store the transport by session ID
                 transports[newSessionId] = transport;
+                servers[newSessionId] = server;
             }
             // DNS rebinding protection is disabled by default for backwards compatibility. If you are running this server
             // locally, make sure to set:
             // enableDnsRebindingProtection: true,
             // allowedHosts: ['127.0.0.1'],
         });
-
-        // Clean up transport when closed
         transport.onclose = (): void => {
             if (transport.sessionId) {
                 delete transports[transport.sessionId];
+                delete servers[transport.sessionId];
             }
         };
-        const apiUrl = req.headers['x-api-url'] as string;
-        const token = req.headers['x-token'] as string;
+
         const server: McpServer = new McpServer({
             name: 'example-server',
             version: '1.0.0'
@@ -221,8 +231,6 @@ app.post('/mcp', async (req: Request, res: Response): Promise<void> => {
                 };
             }
         )
-
-
 
         // ... set up server resources, tools, and prompts ...
 
