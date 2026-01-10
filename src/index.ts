@@ -31,8 +31,6 @@ interface JSONRPCError {
 
 
 interface PaddleOCRInput {
-    apiUrl:string,
-    token: string,
     fileUrl:string
 }
 
@@ -148,7 +146,8 @@ app.post('/mcp', async (req: Request, res: Response): Promise<void> => {
                 delete transports[transport.sessionId];
             }
         };
-
+        const apiUrl = req.headers['x-api-url'] as string;
+        const token = req.headers['x-token'] as string;
         const server: McpServer = new McpServer({
             name: 'example-server',
             version: '1.0.0'
@@ -161,15 +160,13 @@ app.post('/mcp', async (req: Request, res: Response): Promise<void> => {
                 description:
                     "Call Paddle OCR layout parsing API. Supports file URL.",
                 inputSchema: z.object({
-                    apiUrl: z.string().describe("Override Paddle OCR API URL"),
-                    token: z.string().describe("Override API token"),
                     fileUrl: z
                         .string()
                         .describe("HTTP direct link to PDF or image"),
                 }),
             },
             async (args: PaddleOCRInput) => {
-                const {fileUrl, token, apiUrl} = args
+                const {fileUrl} = args
                 const downloaded = await downloadToBase64(fileUrl);
                 const {base64, fileType} = downloaded
 

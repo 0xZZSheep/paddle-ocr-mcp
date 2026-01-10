@@ -18,20 +18,28 @@ npm run build
 * **生产模式**(运行编译后的 JS)：npm run start
 
 ## 使用 MCP Inspector 调试
-MCP Inspector 是一个强大的开发者工具，可以在不接入客户端的情况下，通过浏览器界面直接测试你的 OCR 工具。
+MCP Inspector 是一个强大的开发者工具，可以通过浏览器界面直接测试你的 mcp 工具。
 
-### Windows (PowerShell)
 ```
-$env:DANGEROUSLY_OMIT_AUTH="true"; npx @modelcontextprotocol/inspector
+npx @modelcontextprotocol/inspector
 npm run serve
 ```
-### Windows (CMD)
+
+http headers
+
+```json
+{
+  "x-api-url": "https://xxxxxx.aistudio-app.com/layout-parsing",
+  "x-token": ""
+}
 ```
-set DANGEROUSLY_OMIT_AUTH=true && npx @modelcontextprotocol/inspector
-npm run serve
+
+input params
+
 ```
-### macOS / Linux (Bash/Zsh)
+interface PaddleOCRInput {
+  fileUrl:string //任何可直接预览/下载的pdf或者img直链
+}
 ```
-DANGEROUSLY_OMIT_AUTH=true npx @modelcontextprotocol/inspector
-npm run serve
-```
+
+![d6fcdbd0-dec8-4993-bc3d-997a00d9ea84-image.png](https://likaiqiang-blog.oss-cn-beijing.aliyuncs.com/images/d6fcdbd0-dec8-4993-bc3d-997a00d9ea84-image.png)
