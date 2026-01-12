@@ -7,6 +7,7 @@ import * as z from 'zod';
 import path from "node:path";
 import * as os from "node:os";
 import fs from "fs/promises";
+import {server as paddleServer} from "./paddle";
 
 const app = express();
 app.use(express.json());
@@ -39,14 +40,6 @@ interface JSONRPCError {
 interface PaddleOCRInput {
     fileUrl:string
 }
-
-interface LayoutParsingResult{
-    markdown:{
-        text:string;
-        images: Record<string, string>;
-    }
-}
-
 
 export async function downloadToBase64(
     url: string
@@ -109,20 +102,6 @@ export async function downloadToBase64(
 }
 
 
-function replaceImagesInText(text:string, images:Record<string, string>):string {
-    let result = text;
-
-    for (const [key, url] of Object.entries(images)) {
-        // 转义 key 中可能影响正则的字符
-        const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex = new RegExp(escapedKey, 'g');
-
-        result = result.replace(regex, url);
-    }
-
-    return result;
-}
-
 // Handle POST requests for client-to-server communication
 app.post('/mcp', async (req: Request, res: Response): Promise<void> => {
     // Check for existing session ID
@@ -159,8 +138,8 @@ app.post('/mcp', async (req: Request, res: Response): Promise<void> => {
         };
 
         const server: McpServer = new McpServer({
-            name: 'example-server',
-            version: '1.0.0'
+            name: 'paddle-ocr-mcp',
+            version: '0.0.2'
         });
 
         server.registerTool(
@@ -175,60 +154,15 @@ app.post('/mcp', async (req: Request, res: Response): Promise<void> => {
                         .describe("HTTP direct link to PDF or image"),
                 }),
             },
-            async (args: PaddleOCRInput) => {
-                const {fileUrl} = args
+            async ({fileUrl}) => {
                 const downloaded = await downloadToBase64(fileUrl);
                 const {base64, fileType} = downloaded
-
-                const payload = {
-                    file: base64,
+                return paddleServer({
+                    base64,
                     fileType,
-                    markdownIgnoreLabels: [
-                        "header",
-                        "header_image",
-                        "footer",
-                        "footer_image",
-                        "number",
-                        "footnote",
-                        "aside_text",
-                    ],
-                    useDocOrientationClassify: false,
-                    useDocUnwarping: false,
-                    useLayoutDetection: true,
-                    useChartRecognition: false,
-                    promptLabel: "ocr",
-                    repetitionPenalty: 1,
-                    temperature: 0,
-                    topP: 1,
-                    minPixels: 147384,
-                    maxPixels: 2822400,
-                    layoutNms: true,
-                };
-                const response = await fetch(apiUrl, {
-                    method: "POST",
-                    headers: {
-                        Authorization: `token ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(payload),
-                });
-                if (!response.ok) {
-                    const text = await response.text();
-                    throw new Error(
-                        `Paddle OCR API error: ${response.status} - ${text}`
-                    );
-                }
-                const result = (await response.json())['result']['layoutParsingResults'] as LayoutParsingResult[]
-
-                return {
-                    content: result.map(res=>{
-                        const {text, images} = res.markdown
-                        return {
-                            type:'text',
-                            text: replaceImagesInText(text, images)
-                        }
-                    }),
-                };
+                    apiUrl,
+                    token
+                })
             }
         )
 
